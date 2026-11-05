@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto,
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto,
                                               @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(userService.updateUser(token, userDto));
     }
