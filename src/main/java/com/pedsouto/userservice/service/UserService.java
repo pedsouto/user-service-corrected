@@ -73,7 +73,7 @@ public class UserService {
             userEntity.setPassword(encodedPassword);
         }
 
-        return userMapper.toUserDto(userEntity);
+        return userMapper.toUserDto(userRepository.save(userEntity));
     }
 
     @Transactional
@@ -86,7 +86,7 @@ public class UserService {
 
         userMapper.updateAddressFromDto(addressDto, addressEntity);
 
-        return userMapper.toAddressDto(addressEntity);
+        return userMapper.toAddressDto(addressRepository.save(addressEntity));
     }
 
     @Transactional
@@ -99,7 +99,7 @@ public class UserService {
 
         userMapper.updatePhoneFromDto(phoneDto, phoneEntity);
 
-        return userMapper.toPhoneDto(phoneEntity);
+        return userMapper.toPhoneDto(phoneRepository.save(phoneEntity));
     }
 
     public AddressDto addAddress(String token, AddressDto dto) {
