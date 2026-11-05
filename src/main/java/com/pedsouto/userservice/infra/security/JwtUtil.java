@@ -21,6 +21,13 @@ public class JwtUtil {
             @Value("${jwt.secret}") String secretString,
             @Value("${jwt.expiration}") long expirationTime
     ) {
+        if (secretString == null || secretString.isBlank()) {
+            throw new IllegalArgumentException("JWT secret must not be empty");
+        }
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException("JWT expiration must be greater than zero");
+        }
+
         this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
     }
@@ -47,13 +54,19 @@ public class JwtUtil {
     }
 
     public boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+        Date expiration = extractClaims(token).getExpiration();
+        return expiration == null || expiration.before(new Date());
     }
 
     public boolean validateToken(String token, String username) {
         try {
-            final String extractedUsername = extractUsername(token);
-            return extractedUsername.equals(username) && !isTokenExpired(token);
+            Claims claims = extractClaims(token);
+            Date expiration = claims.getExpiration();
+
+            return claims.getSubject() != null
+                    && claims.getSubject().equals(username)
+                    && expiration != null
+                    && expiration.after(new Date());
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }

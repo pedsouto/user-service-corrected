@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,8 +63,8 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto,
-                                              @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(userService.updateUser(token, userDto));
+                                              Authentication authentication) {
+        return ResponseEntity.ok(userService.updateUser(authentication.getName(), userDto));
     }
 
     @PutMapping("/address")
@@ -85,14 +84,14 @@ public class UserController {
     @PostMapping("/address")
     public ResponseEntity<AddressDto> addAddress(
             @Valid @RequestBody AddressDto dto,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(userService.addAddress(token, dto));
+            Authentication authentication) {
+        return ResponseEntity.ok(userService.addAddress(authentication.getName(), dto));
     }
 
     @PostMapping("/phone")
     public ResponseEntity<PhoneDto> addPhone(
             @Valid @RequestBody PhoneDto dto,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(userService.addPhone(token, dto));
+            Authentication authentication) {
+        return ResponseEntity.ok(userService.addPhone(authentication.getName(), dto));
     }
 }

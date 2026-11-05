@@ -12,7 +12,6 @@ import com.pedsouto.userservice.infra.exception.UnauthorizedException;
 import com.pedsouto.userservice.infra.repository.AddressRepository;
 import com.pedsouto.userservice.infra.repository.PhoneRepository;
 import com.pedsouto.userservice.infra.repository.UserRepository;
-import com.pedsouto.userservice.infra.security.JwtUtil;
 import com.pedsouto.userservice.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +27,6 @@ public class UserService {
     private final PhoneRepository phoneRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
     public UserDto saveUser(UserDto userDto) {
         validateEmail(userDto.email());
@@ -60,13 +58,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(String token, UserDto userDto) {
-        String email = jwtUtil.extractUsername(token.substring(7));
-
+    public UserDto updateUser(String authenticatedEmail, UserDto userDto) {
         String encodedPassword = userDto.password() != null ? passwordEncoder.encode(userDto.password()) : null;
 
-        User userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        User userEntity = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + authenticatedEmail));
 
         userMapper.updateUserFromDto(userDto, userEntity);
         if (encodedPassword != null) {
@@ -102,11 +98,9 @@ public class UserService {
         return userMapper.toPhoneDto(phoneRepository.save(phoneEntity));
     }
 
-    public AddressDto addAddress(String token, AddressDto dto) {
-        String email = jwtUtil.extractUsername(token.substring(7));
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    public AddressDto addAddress(String authenticatedEmail, AddressDto dto) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + authenticatedEmail));
 
         Address address = userMapper.toAddressEntity(dto, user.getId());
         Address savedAddress = addressRepository.save(address);
@@ -114,11 +108,9 @@ public class UserService {
         return userMapper.toAddressDto(savedAddress);
     }
 
-    public PhoneDto addPhone(String token, PhoneDto dto) {
-        String email = jwtUtil.extractUsername(token.substring(7));
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+    public PhoneDto addPhone(String authenticatedEmail, PhoneDto dto) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + authenticatedEmail));
 
         Phone phone = userMapper.toPhoneEntity(dto, user.getId());
         Phone savedPhone = phoneRepository.save(phone);
