@@ -10,7 +10,7 @@ import java.util.List;
 
 @Builder
 public record UserDto(
-        @NotBlank @Size(max = 100) String name,
+        @Size(max = 100) String name,
         @NotBlank @Email @Size(max = 100) String email,
         String password,
         List<@Valid AddressDto> addresses,
