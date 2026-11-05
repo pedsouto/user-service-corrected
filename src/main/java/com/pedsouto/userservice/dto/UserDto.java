@@ -10,9 +10,9 @@ import java.util.List;
 
 @Builder
 public record UserDto(
-        @Size(max = 100) String name,
+        @NotBlank @Size(max = 100) String name,
         @NotBlank @Email @Size(max = 100) String email,
-        String password,
+        @NotBlank String password,
         List<@Valid AddressDto> addresses,
         List<@Valid PhoneDto> phones
 ) {
